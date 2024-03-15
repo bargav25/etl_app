@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+
+
+  data-processing:
+    build: .
+    depends_on:
+      - db-initial
+      - db-transformed
+    volumes:
+      - ./data:/usr/src/app/data
+    networks:
+      - internal
+      
+  db-initial:
+    image: postgres:12
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: your_password
+    volumes:
+      - db-initial-volume:/var/lib/postgresql/data
+    networks:
+      - internal
+
+  db-transformed:
+    image: postgres:12
+    environment:
+      POSTGRES_DB: transformeddb
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: your_password
+    volumes:
+      - db-transformed-volume:/var/lib/postgresql/data
+    networks:
+      - internal
+    ports:
+      - "5432:5432"  # Expose port 5432 on the host to port 5432 on the container
+
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  db-initial-volume:
+  db-transformed-volume:
